@@ -10,6 +10,7 @@ object Hello extends App {
   println(deck.cards.size)
   println(deck.cards)
 
+  println("FIELD:")
 
   var field = new Field()
   field.init()
@@ -17,6 +18,10 @@ object Hello extends App {
   println(field.course)
   println(field.entryPoints)
 
+  println(field.playerStartPositions)
+  println(field.playerEndPositions)
+
+  println("Controller:")
 
 
 }
