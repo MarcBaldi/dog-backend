@@ -3,7 +3,7 @@ package model
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-class Field {
+class HardScuffedField4 {
   var course = new ArrayBuffer[Position]()
   var entryPoints = new ArrayBuffer[Position]()
 
@@ -14,7 +14,7 @@ class Field {
     new ArrayBuffer[Position]()
   }
 
-  def init(armLength: Int = 15, playerAmount: Int = 4, pieceAmount: Int = 4): Unit = {
+  def init(armLength: Int = 16, playerAmount: Int = 4, pieceAmount: Int = 4): Unit = {
     for (i <- 0 until armLength * playerAmount) {
       val position = new Position(i)
       course += position
@@ -29,15 +29,14 @@ class Field {
 
       for (j <- 0 until pieceAmount) {
         val position = new Position(j)
+        position.slot = Some(new Piece(j, new Player(i)))
+        val position2 = new Position(j)
         playerStartPositionsTmp += position
-        playerEndPositionsTmp += position
+        playerEndPositionsTmp += position2
       }
 
       playerStartPositions += (i -> playerStartPositionsTmp)
       playerEndPositions += (i -> playerEndPositionsTmp)
     }
-
-
   }
-
 }

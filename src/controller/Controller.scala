@@ -9,6 +9,8 @@ class Controller {
     val moveController = new MoveController(gameRules)
     val flowController = new FlowController(gameRules)
 
+    cardController.init()
     flowController.start()
+
   }
 }

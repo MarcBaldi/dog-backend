@@ -16,7 +16,7 @@ class CardController(val gameRules: GameRules) {
   def drawHands(cardCount: Int): Unit = {
     deck.shuffle()
     for (i <- 0 to gameRules.playerCount) {
-      playerHands += (i -> deck.draw(cardCount))
+      //playerHands += (i -> deck.draw(cardCount))
     }
   }
 
