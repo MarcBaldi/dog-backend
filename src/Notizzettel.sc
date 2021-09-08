@@ -1,3 +1,6 @@
-def square(x: Int) = 400/20
+def test(): Unit = {
 
-square(2)
+
+}
+
+test()

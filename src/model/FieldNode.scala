@@ -1,14 +1,6 @@
 package model
 
-import scala.collection.mutable.ArrayBuffer
+case class FieldNode(id: Int, description: String) {
 
-class FieldNode(position: Position) {
-
-  var next: ArrayBuffer[FieldNode] = new ArrayBuffer[FieldNode]()
-
-  def toImmutable: FieldNodeFinal = {
-    FieldNodeFinal(position, next.toList)
-  }
-
-
+  override def toString: String = id + "-" + description
 }

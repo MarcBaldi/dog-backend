@@ -10,7 +10,6 @@ class HardScuffedMoveController(val gameRules: GameRules) {
   // ###### SIMPLE Operations ###
   def sendPawnOnField(pawn: Pawn): Unit = {
     field.playerPositions(pawn) = field.startPositions(pawn.player)
-
   }
 
   def sendPawnHome(pawn: Pawn): Unit = {

@@ -1,5 +1,5 @@
 import controller.HardScuffedMoveController
-import model.{Card, Deck, GameRules, HardScuffedField4, Pawn}
+import model.{Card, Deck, GameRules, HardScuffedField4, NotScuffedField, Pawn}
 
 
 object Hello extends App {
@@ -33,6 +33,25 @@ object Hello extends App {
   moveC.sendPawnHome(Pawn(0, 0))
 
   println(moveC.field.playerPositions)
+
+  println("Actually NotScuffed Field:")
+  val currentField = new NotScuffedField
+  currentField.init()
+
+  println(currentField.graph.size)
+  for (x <- currentField.graph) {
+    println(x)
+  }
+
+  var count = 0
+  for (x <- currentField.graph) {
+    if (x._1.toString().endsWith("start")) {
+      println(x._1)
+      count+=1
+    }
+  }
+  println("count: "+count)
+
 
 
 }
