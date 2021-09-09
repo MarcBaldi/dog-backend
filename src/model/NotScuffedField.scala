@@ -2,91 +2,108 @@ package model
 
 import scala.collection.mutable
 
-case class NotScuffedField() {
+case class NotScuffedField(gameRules: GameRules) {
 
   val graph: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = new mutable.HashMap()
 
-  def init(): Unit = {
-    // TODO: read this from gamerules
-    val playerCount = 4
-    this.initFieldNodes(playerCount)
-    this.initPawns(playerCount)
-
+  def init(): NotScuffedField = {
+    this.initFieldNodes()
+    this
   }
 
+  def initFieldNodes(): Unit = {
+    var origin: Option[FieldNode] = None
+    var lastField: Option[FieldNode] = None
 
-  def initFieldNodes(playerCount: Int): Unit = {
-    // TODO: read this from gamerules
-    val normalFieldCount = 15
+    for (player <- 0 until  this.gameRules.playerCount) {
+      var playerSpawn: Option[FieldNode] = None
+      PawnFactory.resetPawns()
 
-    // TODO: null to option
-    var origin:FieldNode = null
-    var lastField:FieldNode = null
-
-    for (_ <- 0 until  playerCount) {
-      var playerSpawn:FieldNode = null
-
-      for (i <- 0 until normalFieldCount) {
+      for (i <- 0 until this.gameRules.armLength) {
         val currentField = FieldNodeFactory.createFieldNode("field")
         graph.put(currentField, new mutable.HashSet[FieldNode])
 
         if (i == 0) {
-          playerSpawn = currentField
+          playerSpawn = Some(currentField)
         }
-        if (lastField == null) {
-          origin = currentField
-          lastField = currentField
+        if (lastField.isEmpty) {
+          origin = Some(currentField)
         } else {
-          graph(lastField).addOne(currentField)
-          lastField = currentField
+          graph(lastField.get).addOne(currentField)
         }
+        lastField = Some(currentField)
       }
 
-      var lastGoal:FieldNode = null
-      for (_ <- 0 until 4) {
+      var lastGoal: Option[FieldNode] = None
+      for (_ <- 0 until this.gameRules.pieceAmount) {
         val start = FieldNodeFactory.createFieldNode("start")
         val set = new mutable.HashSet[FieldNode]
-        set.addOne(playerSpawn)
+        set.addOne(playerSpawn.get)
         graph.put(start, set)
+
+        // Create pawns in start fields
+        val pawn = PawnFactory.createPawn(player)
+        start.currentPawn = pawn
       }
-      for (_ <- 0 until 4) {
+      for (_ <- 0 until this.gameRules.pieceAmount) {
         val goal = FieldNodeFactory.createFieldNode("goal")
         graph.put(goal, new mutable.HashSet[FieldNode])
-        if (lastGoal == null) {
-          graph(lastField).addOne(goal)
+        if (lastGoal.isEmpty) {
+          graph(lastField.get).addOne(goal)
         } else {
-          graph(lastGoal).addOne(goal)
+          graph(lastGoal.get).addOne(goal)
         }
-        lastGoal = goal
+        lastGoal = Some(goal)
       }
     }
-    graph(lastField).addOne(origin)
+    graph(lastField.get).addOne(origin.get)
   }
 
-  def initPawns(playerCount: Int): Unit = {
 
-    PawnFactory.resetPawns()
+  def getField: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = {
+    this.graph
+  }
 
-    for (playerID <- 0 until 4) {
-      val player = new Player(playerID)
-      for (_ <- 0 until 4) {
+  def getField(pawn: Pawn): FieldNode = {
+    for (field <- graph) {
+      if (field._1.currentPawn.nonEmpty && field._1.currentPawn.get == pawn) {
+        return field._1
+      }
+    }
+    throw new Exception("Gibt Problem Junge. pawn nicht gefunden")
+  }
 
+  def movePawn(pawn: Pawn, newField: FieldNode): Unit = {
+    val oldField = this.getField(pawn)
+    oldField.resetPawn()
+    newField.currentPawn = pawn
+  }
+
+  def getAllPawns: mutable.HashSet[Pawn] = {
+    val res = new mutable.HashSet[Pawn]()
+    for (field <- graph) {
+      if (field._1.currentPawn.nonEmpty) {
+        res.addOne(field._1.currentPawn.get)
+      }
+    }
+    res
+  }
+
+  // ###### DEBUG Operations ###
+  // TODO: disable outside of dev
+
+  def initTestBoard(): Unit = {
+    // TODO: put some example pawns
+    var counter = 0
+    for (field <- graph) {
+      if (field._1.currentPawn.isEmpty) {
+        val pawn = PawnFactory.createPawn(0)
+        field._1.currentPawn = pawn
+        counter += 1
+        if (counter >= 10) {
+          return
+        }
       }
     }
   }
-    /*
-      def reCalcView(): Unit = {
-        var course = new ArrayBuffer[Position]()
-        var entryPoints = new ArrayBuffer[Position]()
-        var playerStartPositions: mutable.Map[Int, ArrayBuffer[Position]] = collection.mutable.Map(0 -> initArrayBuffer())
-        var playerEndPositions: mutable.Map[Int, ArrayBuffer[Position]] = collection.mutable.Map(0 -> initArrayBuffer())
-
-        for ((pawn, position) <- playerPositions) {
-          if (position) {
-
-          }
-        }
-
-
-      }*/
 }

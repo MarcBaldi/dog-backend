@@ -1,4 +1,4 @@
-import controller.HardScuffedMoveController
+import controller.{HardScuffedMoveController, NotScuffedMoveController}
 import model.{Card, Deck, GameRules, HardScuffedField4, NotScuffedField, Pawn}
 
 
@@ -13,7 +13,7 @@ object Hello extends App {
   println(deck.draw(4))
   println(deck.cards.size)
   //println(deck.cards)
-
+/*
   println("Model Field:")
   var field = new HardScuffedField4()
   field.init()
@@ -33,9 +33,9 @@ object Hello extends App {
   moveC.sendPawnHome(Pawn(0, 0))
 
   println(moveC.field.playerPositions)
-
+*/
   println("Actually NotScuffed Field:")
-  val currentField = new NotScuffedField
+  val currentField = NotScuffedField(gameRules)
   currentField.init()
 
   println(currentField.graph.size)
@@ -46,11 +46,24 @@ object Hello extends App {
   var count = 0
   for (x <- currentField.graph) {
     if (x._1.toString().endsWith("start")) {
-      println(x._1)
       count+=1
     }
   }
-  println("count: "+count)
+  println("start field count: "+count)
+
+  println("Controller Move:")
+  val moveC = new NotScuffedMoveController(gameRules)
+  moveC.getField.initTestBoard()
+  moveC.printField()
+  println("pawn count: "+moveC.getField.getAllPawns.size)
+
+  val testPawn = moveC.getRandomPawn
+
+  moveC.move(testPawn, new Card(2))
+  moveC.move(testPawn, new Card(2))
+  moveC.move(testPawn, new Card(2))
+
+
 
 
 
