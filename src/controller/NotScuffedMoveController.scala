@@ -3,8 +3,8 @@ package controller
 import scala.collection.mutable
 import model.{Card, FieldNode, GameRules, NotScuffedField, Pawn}
 
-class NotScuffedMoveController(val gameRules: GameRules) {
-  private val field = NotScuffedField(gameRules).init()
+class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = true) {
+  private val field = NotScuffedField(gameRules).init(withPawns)
   private val simpleCards = List(2,3,5,6,8,9,10,12)
 
   // ###### MOVE Operations ###
@@ -18,28 +18,9 @@ class NotScuffedMoveController(val gameRules: GameRules) {
 
   def moveSimple(pawn: Pawn, card: Card): Unit = {
     val possibleFields = calcPossibleTargets(field.getField(pawn), card.getValue)
-    this.movePawn(pawn, possibleFields.head)
-  }
-
-
-
-
-  def movePawn(pawn: Pawn, target: FieldNode): Unit = {
-    field.movePawn(pawn, target)
+    field.movePawn(pawn, possibleFields.head)
     println("moved:" + pawn)
-    println("to: " + target)
-  }
-
-  def sendPawnOnField(pawn: Pawn): Unit = {
-    //field.playerPositions(pawn) = field.startPositions(pawn.player)
-  }
-
-  def sendPawnHome(pawn: Pawn): Unit = {
-    //val positionId = (pawn.player + 1) * 100
-    //val range = positionId until positionId + 4
-
-    //val res = range.toSet -- field.playerPositions.values
-    //field.playerPositions(pawn) = res.head
+    println("to: " + possibleFields.head)
   }
 
 
@@ -113,6 +94,17 @@ class NotScuffedMoveController(val gameRules: GameRules) {
   def printField(): Unit = {
     for (x <- field.graph)
       println(x)
+  }
+
+  def demo(): Unit = {
+    val pawn = getRandomPawn
+    println(field.getField(pawn))
+    field.sendPawnHome(pawn)
+    println(field.getField(pawn))
+
+    field.sendPawnOnField(pawn)
+    println(field.getField(pawn))
+
   }
 
 }
