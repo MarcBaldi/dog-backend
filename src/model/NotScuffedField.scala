@@ -77,19 +77,6 @@ case class NotScuffedField(gameRules: GameRules) {
   }
 
 
-  def getField: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = {
-    this.graph
-  }
-
-  def getField(pawn: Pawn): FieldNode = {
-    for (field <- graph.keys) {
-      if (field.currentPawn.nonEmpty && field.currentPawn.get == pawn) {
-        return field
-      }
-    }
-    throw new Exception("Gibt Problem Junge. pawn nicht gefunden")
-  }
-
   def movePawn(pawn: Pawn, newField: FieldNode): Unit = {
     val oldField = this.getField(pawn)
     oldField.resetPawn()
@@ -99,7 +86,30 @@ case class NotScuffedField(gameRules: GameRules) {
   def sendPawnOnField(pawn: Pawn): Unit = {
     val player = pawn.player
     val spawn = this.getSpawnField(player)
-    movePawn(pawn, spawn)
+    this.movePawn(pawn, spawn)
+  }
+
+  def sendPawnHome(pawn: Pawn): Unit = {
+    val player = pawn.player
+    val home = this.getFreeStartOf(player)
+    this.movePawn(pawn, home)
+  }
+
+  def swapPawns(pawn1: Pawn, pawn2: Pawn): Unit = {
+    val field1 = this.getField(pawn1)
+    val field2 = this.getField(pawn2)
+    this.movePawn(pawn1, field2)
+    this.movePawn(pawn2, field1)
+  }
+
+  // ###### HELPER Operations ###
+  def getField(pawn: Pawn): FieldNode = {
+    for (field <- graph.keys) {
+      if (field.currentPawn.nonEmpty && field.currentPawn.get == pawn) {
+        return field
+      }
+    }
+    throw new Exception("Gibt Problem Junge. pawn nicht gefunden")
   }
 
   def getSpawnField(player: Int): FieldNode = {
@@ -109,12 +119,6 @@ case class NotScuffedField(gameRules: GameRules) {
       }
     }
     throw new Exception("Gibt Problem Junge. Spawn nicht gefunden")
-  }
-
-  def sendPawnHome(pawn: Pawn): Unit = {
-    val player = pawn.player
-    val home = this.getFreeStartOf(player)
-    movePawn(pawn, home)
   }
 
   def getFreeStartOf(player: Int): FieldNode = {
@@ -139,6 +143,10 @@ case class NotScuffedField(gameRules: GameRules) {
 
   // ###### DEBUG Operations ###
   // TODO: disable outside of dev
+
+  def getField: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = {
+    this.graph
+  }
 
   def initTestBoard(): Unit = {
     PawnFactory.resetPawns()
