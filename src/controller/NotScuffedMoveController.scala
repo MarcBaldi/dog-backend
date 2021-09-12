@@ -1,5 +1,7 @@
 package controller
 
+import com.typesafe.scalalogging.Logger
+
 import scala.collection.mutable
 import model.{Card, FieldNode, GameRules, NotScuffedField, Pawn}
 
@@ -7,26 +9,42 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
   private val field = NotScuffedField(gameRules).init(withPawns)
   private val simpleCards = List(2,3,5,6,8,9,10,12)
 
+  val logger: Logger = Logger("MoveController")
+
   // ###### MOVE Operations ###
   def move(pawn: Pawn, card: Card): Unit = {
     if (isSimpleCard(card)) {
       moveSimple(pawn, card)
     } else {
-      // TODO: Handling for special cards
       moveComplex(pawn, card)
     }
   }
 
   def moveSimple(pawn: Pawn, card: Card): Unit = {
     val possibleFields = calcPossibleTargets(field.getField(pawn), card.getValue)
-    field.movePawn(pawn, possibleFields.head)
-    println("moved:" + pawn)
-    println("to: " + possibleFields.head)
+    if (possibleFields.isEmpty) {
+      logger.info("Did not move!: " + possibleFields.size)
+      logger.info("pawn: " + pawn)
+      logger.info("field: " + field.getField(pawn))
+      logger.info("card: " + card)
+      println("Did not move:" + pawn)
+      return
+      // TODO: must be prevented by ifCardPlayable
+      throw new Exception("Could not move. no move with card: " + card + " and pawn: " + pawn + " in field: " + getField.getField(pawn))
+    }
+    // TODO: remove this, add input for goal
+    for (step <- possibleFields) {
+      if (step.fieldType == model.FieldType.field || step.fieldType == model.FieldType.spawn) {
+        field.movePawn(pawn, step)
+        return
+      }
+    }
   }
 
   def moveComplex(pawn: Pawn, card: Card): Unit = {
     if (card.getValue == 1) {
       this.move1(pawn)
+
     } else if (card.getValue == 4) {
       this.move4(pawn)
 
@@ -39,9 +57,9 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
     } else if (card.getValue == 13) {
       this.move13(pawn)
 
-    } else if (card.getValue == 14) {
+    } else if (card.getValue == 0) {
+      // Joker is id 0!
       this.move14(pawn)
-
     }
   }
 
@@ -53,7 +71,7 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
 
   def calcPossibleTargetsR(targets: mutable.HashSet[FieldNode], start: FieldNode, moveCount: Int): mutable.HashSet[FieldNode] = {
     if (moveCount == 0) {return targets}
-    for (step <- field.graph(start)) {
+    for (step <- field.getGraph(start)) {
       if (moveCount == 1) {
         targets.addOne(step)
       }
@@ -69,16 +87,16 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
   }
 
   def calcPossibleTargetsReverseR(targets: mutable.HashSet[FieldNode], start: FieldNode, moveCount: Int): mutable.HashSet[FieldNode] = {
-    if (moveCount == 0) {return targets}
+    if (moveCount == 0) {return targets.addOne(start)}
 
     // find precedents
     val precedents: mutable.HashSet[FieldNode] = mutable.HashSet()
-    for (step <- field.graph) {
+    for (step <- field.getGraph) {
        if (step._2.contains(start)) {
          precedents.addOne(step._1)
        }
     }
-    for (step <- precedents) {
+      for (step <- precedents) {
       // add all, because in loop
       targets.addAll(this.calcPossibleTargetsReverseR(targets, step, moveCount - 1))
     }
@@ -109,28 +127,34 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
 
   def move7(pawn: Pawn): Unit = {
     // TODO: input single pawns
-    val input = null // ??
-    field.movePawn(pawn, input)
+    val input = 1 // ??
+    this.move(pawn, Card(input))
   }
 
   def move11(pawn: Pawn): Unit = {
     // BOOBA
     // TODO: input second pawn
     val input = getRandomPawn
-    field.swapPawns(pawn, input)
+    field.swapPawns(pawn, pawn)
   }
 
   def move13(pawn: Pawn): Unit = {
     // KING
     // TODO: input 13, spawn(0?)
-    val input = 13
+    val input = 1
+    if (input == 13) {
+      val possibleFields = calcPossibleTargets(field.getField(pawn), input)
+      field.movePawn(pawn, possibleFields.head)
+    } else {
+      field.sendPawnOnField(pawn)
+    }
   }
 
   def move14(pawn: Pawn): Unit = {
     // JOKER
     // TODO: input 1,2,3,4,5,6,7,8,9,10,11,12,13
-    val input = 1
-    this.move(pawn, new Card(input))
+    val input = 2
+    this.move(pawn, Card(input))
   }
 
 
@@ -169,7 +193,7 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
   }
 
   def getRandomPawn: Pawn = {
-    for (x <- field.graph)
+    for (x <- field.getGraph)
       if (x._1.currentPawn.nonEmpty) {
         return x._1.currentPawn.get
       }
@@ -177,7 +201,7 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
   }
 
   def printField(): Unit = {
-    for (x <- field.graph)
+    for (x <- field.getGraph)
       println(x)
   }
 

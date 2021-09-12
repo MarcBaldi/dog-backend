@@ -1,12 +1,13 @@
 package model
 
-import com.sun.org.apache.xpath.internal.operations.And
+import com.typesafe.scalalogging.Logger
 
 import scala.collection.mutable
 
 case class NotScuffedField(gameRules: GameRules) {
+  private val graph: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = new mutable.HashMap()
 
-  val graph: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = new mutable.HashMap()
+  val logger: Logger = Logger("Field")
 
   def init(withPawns: Boolean = true): NotScuffedField = {
     this.initFieldNodes()
@@ -22,7 +23,7 @@ case class NotScuffedField(gameRules: GameRules) {
       var playerSpawn: Option[FieldNode] = None
 
       for (i <- 0 until this.gameRules.armLength) {
-        val currentField = FieldNodeFactory.createFieldNode("field")
+        val currentField = FieldNodeFactory.createFieldNode()
         currentField.fieldType = FieldType.field
         graph.put(currentField, new mutable.HashSet[FieldNode])
 
@@ -41,21 +42,21 @@ case class NotScuffedField(gameRules: GameRules) {
 
       var lastGoal: Option[FieldNode] = None
       for (_ <- 0 until this.gameRules.pieceAmount) {
-        val start = FieldNodeFactory.createFieldNode("start")
+        val start = FieldNodeFactory.createFieldNode()
         start.player = player
         start.fieldType = FieldType.start
         val set = new mutable.HashSet[FieldNode]
         set.addOne(playerSpawn.get)
         graph.put(start, set)
-
       }
+
       for (_ <- 0 until this.gameRules.pieceAmount) {
-        val goal = FieldNodeFactory.createFieldNode("goal")
+        val goal = FieldNodeFactory.createFieldNode()
         goal.player = player
         goal.fieldType = FieldType.goal
         graph.put(goal, new mutable.HashSet[FieldNode])
         if (lastGoal.isEmpty) {
-          graph(lastField.get).addOne(goal)
+          graph(playerSpawn.get).addOne(goal)
         } else {
           graph(lastGoal.get).addOne(goal)
         }
@@ -144,22 +145,66 @@ case class NotScuffedField(gameRules: GameRules) {
   // ###### DEBUG Operations ###
   // TODO: disable outside of dev
 
-  def getField: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = {
+  def getGraph: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = {
     this.graph
   }
 
   def initTestBoard(): Unit = {
     PawnFactory.resetPawns()
-    var counter = 0
+
+    var field = this.getFirstField
+    var pawn = PawnFactory.createPawn(0)
+    field.currentPawn = pawn
+
+    for (_ <- 0 until 4) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(1)
+    field.currentPawn = pawn
+
+    for (_ <- 0 until 2) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(2)
+    field.currentPawn = pawn
+
+    for (_ <- 0 until 8) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(3)
+    field.currentPawn = pawn
+
+    for (_ <- 0 until 5) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(0)
+    field.currentPawn = pawn
+
+    for (_ <- 0 until 6) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(1)
+    field.currentPawn = pawn
+
+    // TODO: Maybe add some more, and encapsulate
+
+  }
+
+  def getFirstField: FieldNode = {
     for (field <- graph.keys) {
-      if (field.currentPawn.isEmpty) {
-        val pawn = PawnFactory.createPawn((Math.random()*gameRules.playerCount).toInt)
-        field.currentPawn = pawn
-        counter += 1
-        if (counter >= 10) {
-          return
-        }
+      if (field.fieldType == FieldType.spawn && field.player.contains(0)) {
+        return field
       }
     }
+    throw new Exception("no first field found!!")
+  }
+
+  def getNextField(field: FieldNode): FieldNode = {
+    for (step <- graph(field)) {
+      if (step.fieldType == FieldType.field || step.fieldType == FieldType.spawn ) {
+        return step
+      }
+    }
+    throw new Exception("no Next field found!!")
   }
 }

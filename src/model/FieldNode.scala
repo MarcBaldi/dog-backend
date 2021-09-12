@@ -2,19 +2,11 @@ package model
 
 import model.FieldType.FieldType
 
-case class FieldNode(id: Int, description: String) {
-
-  override def toString: String = id + "-" + description + "-[" + currentPawn + "]"
-
-  def isStart: Boolean = {
-    description.contains("start")
-  }
-  def isGoal: Boolean = {
-    description.contains("goal")
-  }
+case class FieldNode(id: Int) {
+  override def toString: String = s"$id-$fieldType-[$currentPawn]-P" + this.getIfPlayer
 
   // TYPE
-  private[this] var _fieldType: Option[FieldType] = None
+  private[this] var _fieldType: Option[FieldType] = Some(FieldType.field)
 
   // FieldType will always be set at the time of requesting the value
   def fieldType: FieldType = _fieldType.get
@@ -23,7 +15,7 @@ case class FieldNode(id: Int, description: String) {
     _fieldType = Some(value)
   }
 
-  // PLAYER
+  // PLAYER - owner of this start,spawn or goal field
   private[this] var _player: Option[Int] = None
 
   def player: Option[Int] = _player
@@ -34,6 +26,11 @@ case class FieldNode(id: Int, description: String) {
 
   def resetPlayer(): Unit = {
     _player = None
+  }
+
+  def getIfPlayer: String = {
+    if (player.isEmpty) return ""
+    player.get.toString
   }
 
   // PAWN

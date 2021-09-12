@@ -1,6 +1,6 @@
 package model
 
-class Card(val id: Int) {
+case class Card(id: Int) {
   def getValue: Int = id % 14
 
   def getDescription: String = {

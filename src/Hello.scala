@@ -1,8 +1,12 @@
+import com.typesafe.scalalogging.Logger
 import controller.{HardScuffedMoveController, NotScuffedMoveController}
 import model.{Card, Deck, GameRules, HardScuffedField4, NotScuffedField, Pawn}
 
 
 object Hello extends App {
+
+  val logger = Logger("TestClass Hello")
+
   println("Hello, World!")
   val gameRules = new GameRules()
 
@@ -38,14 +42,14 @@ object Hello extends App {
   val currentField = NotScuffedField(gameRules)
   currentField.init()
 
-  println(currentField.graph.size)
-  for (x <- currentField.graph) {
+  println(currentField.getGraph.size)
+  for (x <- currentField.getGraph) {
     println(x)
   }
 
   var count = 0
-  for (x <- currentField.graph) {
-    if (x._1.toString().endsWith("start")) {
+  for (x <- currentField.getGraph.keys) {
+    if (x.fieldType == model.FieldType.start) {
       count+=1
     }
   }
@@ -54,17 +58,42 @@ object Hello extends App {
   println("Controller Move:")
   val moveC = new NotScuffedMoveController(gameRules, false)
   moveC.getField.initTestBoard()
-  moveC.printField()
+  //moveC.printField()
   println("pawn count: "+moveC.getField.getAllPawns.size)
 
   val testPawn = moveC.getRandomPawn
 
+  moveC.move(testPawn, new Card(1))
+  println("(1) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
   moveC.move(testPawn, new Card(2))
-  moveC.move(testPawn, new Card(2))
-  moveC.move(testPawn, new Card(2))
+  println("(2) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(3))
+  println("(3) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(4))
+  println("(4) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(5))
+  println("(5) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(6))
+  println("(6) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(8))
+  println("(8) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(9))
+  println("(9) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(10))
+  println("(10) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(11))
+  println("(11) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(12))
+  println("(12) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(13))
+  println("(13) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(14))
+  println("(14) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
+  moveC.move(testPawn, new Card(7))
+  println("(7) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
 
+  logger.debug("Logger is working.")
   moveC.demo()
-
 
 
 }
