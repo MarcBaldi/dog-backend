@@ -105,10 +105,14 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
 
   def move1(pawn: Pawn): Unit = {
     // ASS
-    // TODO: input 1,11
+    // TODO: input 1,11,spawn
     val input = 1
-    val possibleFields = calcPossibleTargets(field.getField(pawn), input)
-    field.movePawn(pawn, possibleFields.head)
+    if (input == 1 || input == 11) {
+      val possibleFields = calcPossibleTargets(field.getField(pawn), input)
+      field.movePawn(pawn, possibleFields.head)
+    } else {
+      field.sendPawnOnField(pawn)
+    }
   }
 
   def move4(pawn: Pawn): Unit = {
@@ -140,7 +144,7 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
 
   def move13(pawn: Pawn): Unit = {
     // KING
-    // TODO: input 13, spawn(0?)
+    // TODO: input 13, spawn
     val input = 1
     if (input == 13) {
       val possibleFields = calcPossibleTargets(field.getField(pawn), input)
