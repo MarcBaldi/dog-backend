@@ -1,8 +1,8 @@
 package controller
 
-import model.GameRules
+import model.GameData
 
-class RestInputController(val gameRules: GameRules) {
+class RestInputController(val gameData: GameData) {
 
   def init(): Unit = {
 

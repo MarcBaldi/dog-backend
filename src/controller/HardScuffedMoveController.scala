@@ -1,8 +1,8 @@
 package controller
 
-import model.{Card, GameRules, HardScuffedField4, Pawn}
+import model.{Card, GameData, HardScuffedField4, Pawn}
 
-class HardScuffedMoveController(val gameRules: GameRules) {
+class HardScuffedMoveController(val gameData: GameData) {
 
   var field = new HardScuffedField4()
   field.init()

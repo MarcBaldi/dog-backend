@@ -1,22 +1,28 @@
 package controller
 
-import model.{Card, Deck, GameRules}
+import com.typesafe.scalalogging.Logger
+import javafx.util.Pair
+import model.{Card, Deck, GameData}
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
-class CardController(val gameRules: GameRules) {
+class CardController(val gameData: GameData) {
   var deck = new Deck()
-  var playerHands: mutable.Map[Int, ArrayBuffer[Card]] = collection.mutable.Map(0 -> new ArrayBuffer[Card]())
+  var playerHands: mutable.Map[Int, mutable.ArrayBuffer[Card]] = mutable.Map()
+  val logger: Logger = Logger("TInputController")
 
   def init(): Unit = {
-    drawHands(6)
+    playerHands.clear()
+    for (player <- 0 until gameData.playerCount) {
+      playerHands += ((player, new mutable.ArrayBuffer[Card]()))
+      logger.info(s"added player $player to playerHands")
+    }
   }
 
   def drawHands(cardCount: Int): Unit = {
     deck.shuffle()
-    for (i <- 0 to gameRules.playerCount) {
-      //playerHands += (i -> deck.draw(cardCount))
+    for (i <- 0 to gameData.playerCount) {
+      playerHands += (i -> deck.draw(cardCount))
     }
   }
 

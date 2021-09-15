@@ -4,7 +4,7 @@ import com.typesafe.scalalogging.Logger
 
 import scala.collection.mutable
 
-case class NotScuffedField(gameRules: GameRules) {
+case class NotScuffedField(gameData: GameData) {
   private val graph: mutable.Map[FieldNode, mutable.HashSet[FieldNode]] = new mutable.HashMap()
 
   val logger: Logger = Logger("Field")
@@ -19,10 +19,10 @@ case class NotScuffedField(gameRules: GameRules) {
     var origin: Option[FieldNode] = None
     var lastField: Option[FieldNode] = None
 
-    for (player <- 0 until  this.gameRules.playerCount) {
+    for (player <- 0 until  this.gameData.playerCount) {
       var playerSpawn: Option[FieldNode] = None
 
-      for (i <- 0 until this.gameRules.armLength) {
+      for (i <- 0 until this.gameData.armLength) {
         val currentField = FieldNodeFactory.createFieldNode()
         currentField.fieldType = FieldType.field
         graph.put(currentField, new mutable.HashSet[FieldNode])
@@ -35,35 +35,35 @@ case class NotScuffedField(gameRules: GameRules) {
         if (lastField.isEmpty) {
           origin = Some(currentField)
         } else {
-          graph(lastField.get).addOne(currentField)
+          graph(lastField.get) += currentField
         }
         lastField = Some(currentField)
       }
 
       var lastGoal: Option[FieldNode] = None
-      for (_ <- 0 until this.gameRules.pieceAmount) {
+      for (_ <- 0 until this.gameData.pieceAmount) {
         val start = FieldNodeFactory.createFieldNode()
         start.player = player
         start.fieldType = FieldType.start
         val set = new mutable.HashSet[FieldNode]
-        set.addOne(playerSpawn.get)
+        set += playerSpawn.get
         graph.put(start, set)
       }
 
-      for (_ <- 0 until this.gameRules.pieceAmount) {
+      for (_ <- 0 until this.gameData.pieceAmount) {
         val goal = FieldNodeFactory.createFieldNode()
         goal.player = player
         goal.fieldType = FieldType.goal
         graph.put(goal, new mutable.HashSet[FieldNode])
         if (lastGoal.isEmpty) {
-          graph(playerSpawn.get).addOne(goal)
+          graph(playerSpawn.get) += goal
         } else {
-          graph(lastGoal.get).addOne(goal)
+          graph(lastGoal.get) += goal
         }
         lastGoal = Some(goal)
       }
     }
-    graph(lastField.get).addOne(origin.get)
+    graph(lastField.get) += origin.get
   }
 
   // Create pawns in start fields
@@ -136,7 +136,7 @@ case class NotScuffedField(gameRules: GameRules) {
     val res = new mutable.HashSet[Pawn]()
     for (field <- graph.keys) {
       if (field.currentPawn.nonEmpty) {
-        res.addOne(field.currentPawn.get)
+        res += field.currentPawn.get
       }
     }
     res

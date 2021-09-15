@@ -1,6 +1,6 @@
 import com.typesafe.scalalogging.Logger
 import controller.{HardScuffedMoveController, NotScuffedMoveController}
-import model.{Card, Deck, GameRules, HardScuffedField4, NotScuffedField, Pawn}
+import model.{Card, Deck, GameData, HardScuffedField4, NotScuffedField, Pawn}
 
 
 object Hello extends App {
@@ -8,7 +8,7 @@ object Hello extends App {
   val logger = Logger("TestClass Hello")
 
   println("Hello, World!")
-  val gameRules = new GameRules()
+  val gameData = new GameData()
 
   println("Model Deck:")
   var deck = new Deck()
@@ -24,7 +24,7 @@ object Hello extends App {
   println(field.playerPositions)
 
   println("Controller Move:")
-  val moveC = new HardScuffedMoveController(gameRules)
+  val moveC = new HardScuffedMoveController(gameData)
   moveC.sendPawnOnField(Pawn(0, 0))
 
   println(moveC.field.playerPositions)
@@ -39,7 +39,7 @@ object Hello extends App {
   println(moveC.field.playerPositions)
 */
   println("Actually NotScuffed Field:")
-  val currentField = NotScuffedField(gameRules)
+  val currentField = NotScuffedField(gameData)
   currentField.init()
 
   println(currentField.getGraph.size)
@@ -56,7 +56,7 @@ object Hello extends App {
   println("start field count: "+count)
 
   println("Controller Move:")
-  val moveC = new NotScuffedMoveController(gameRules, false)
+  val moveC = new NotScuffedMoveController(gameData, false)
   moveC.getField.initTestBoard()
   //moveC.printField()
   println("pawn count: "+moveC.getField.getAllPawns.size)

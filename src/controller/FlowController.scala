@@ -1,8 +1,8 @@
 package controller
 
-import model.GameRules
+import model.GameData
 
-class FlowController(val gameRules: GameRules) {
+class FlowController(val gameData: GameData) {
 
   def init(): Unit = {
 
@@ -10,6 +10,18 @@ class FlowController(val gameRules: GameRules) {
 
   def start(): Unit = {
 
+
+  }
+
+  def gameLoop(): Unit = {
+
+
+    while (true) {
+
+
+
+
+    }
 
   }
 

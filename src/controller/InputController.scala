@@ -1,8 +1,8 @@
 package controller
 
-import model.GameRules
+import model.GameData
 
-class InputController(val gameRules: GameRules) {
+class InputController(val gameData: GameData) {
 
   def cardInput: Option[model.Card] = {
     throw new NotImplementedError()

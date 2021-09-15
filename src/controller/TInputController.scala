@@ -1,11 +1,11 @@
 package controller
 
 import com.typesafe.scalalogging.Logger
-import model.{GameRules, PawnFactory}
+import model.{GameData, PawnFactory}
 
 import scala.io.StdIn.readInt
 
-class TInputController(override val gameRules: GameRules) extends InputController(gameRules) {
+class TInputController(override val gameData: GameData) extends InputController(gameData) {
 
   val logger: Logger = Logger("TInputController")
 

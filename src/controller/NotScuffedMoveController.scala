@@ -3,10 +3,10 @@ package controller
 import com.typesafe.scalalogging.Logger
 
 import scala.collection.mutable
-import model.{Card, FieldNode, GameRules, NotScuffedField, Pawn}
+import model.{Card, FieldNode, GameData, NotScuffedField, Pawn}
 
-class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = true) {
-  private val field = NotScuffedField(gameRules).init(withPawns)
+class NotScuffedMoveController(val gameData: GameData, withPawns: Boolean = true) {
+  private val field = NotScuffedField(gameData).init(withPawns)
   private val simpleCards = List(2,3,5,6,8,9,10,12)
 
   val logger: Logger = Logger("MoveController")
@@ -73,7 +73,7 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
     if (moveCount == 0) {return targets}
     for (step <- field.getGraph(start)) {
       if (moveCount == 1) {
-        targets.addOne(step)
+        targets += step
       }
       // add all, because in loop
       targets.addAll(this.calcPossibleTargetsR(targets, step, moveCount - 1))
@@ -87,13 +87,13 @@ class NotScuffedMoveController(val gameRules: GameRules, withPawns: Boolean = tr
   }
 
   def calcPossibleTargetsReverseR(targets: mutable.HashSet[FieldNode], start: FieldNode, moveCount: Int): mutable.HashSet[FieldNode] = {
-    if (moveCount == 0) {return targets.addOne(start)}
+    if (moveCount == 0) {return targets += start}
 
     // find precedents
     val precedents: mutable.HashSet[FieldNode] = mutable.HashSet()
     for (step <- field.getGraph) {
        if (step._2.contains(start)) {
-         precedents.addOne(step._1)
+         precedents += step._1
        }
     }
       for (step <- precedents) {
