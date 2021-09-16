@@ -10,7 +10,7 @@ object GameController extends App {
 
   val cardController = new CardController(gameData)
   val moveController = new NotScuffedMoveController(gameData)
-  val flowController = new FlowController(gameData)
+  val flowController = new FlowController(gameData, inputController, cardController, moveController)
 
   this.initControllers()
   this.gameLoop()

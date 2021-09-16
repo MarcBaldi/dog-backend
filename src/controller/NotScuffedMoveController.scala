@@ -163,6 +163,15 @@ class NotScuffedMoveController(val gameData: GameData, withPawns: Boolean = true
 
 
   // ###### CHECKS Operations ###
+  def isPlayerFinished(player: Int): Boolean = {
+    for (field <- this.field.getGraph.keys) {
+      if (field.fieldType == model.FieldType.goal && field.player.contains(player) && field.currentPawn.isEmpty) {
+        return false
+      }
+    }
+    true
+  }
+
   def isSimpleMove(pawn: Pawn, card: Card): Boolean = {
      isSimpleCard(card) && !hasCardChoicesNow(pawn, card)
   }
