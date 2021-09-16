@@ -14,7 +14,6 @@ class FlowController(val gameData: GameData, inputController: InputController, c
 
   def start(): Unit = {
 
-
   }
 
   def gameLoop(): Unit = {
@@ -48,11 +47,13 @@ class FlowController(val gameData: GameData, inputController: InputController, c
     this.gameData.gameState = GameState.chooseCard
   }
   def handleCard(): Unit = {
+    this.printHand()
     this.currentCard = inputController.cardInput
 
     this.gameData.gameState = GameState.choosePawn
   }
   def handlePawn(): Unit = {
+    this.printField()
     val pawn = inputController.pawnInput
     moveController.move(pawn.get,currentCard.get)
 
@@ -76,5 +77,14 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   def defineCardCount(currentRound: Int): Int = {
     logger.info("calcCards: " + (6 - (currentRound % 5)))
     6 - (currentRound % 5)
+  }
+  def printHand(): Unit = {
+    val hand = cardController.playerHands(this.gameData.currentPlayer)
+    println(hand)
+  }
+  def printField(): Unit = {
+    val field = moveController.getField
+
+    println(field)
   }
 }
