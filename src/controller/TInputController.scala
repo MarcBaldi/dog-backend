@@ -69,7 +69,6 @@ class TInputController(override val gameData: GameData) extends InputController(
 
   }
   private def outputFieldV2(field: model.NotScuffedField): Unit = {
-    val graph = field.getGraph
     println("printing graph as Field:")
 
     println("""
@@ -86,11 +85,35 @@ class TInputController(override val gameData: GameData) extends InputController(
     println("m"*19*5)
 
     val spawn = field.getSpawnField(0)
+    var currentField = spawn
     field.getNextField(spawn)
-    println("[" + spawn.id +"] ["+ field.getNextField(spawn).id + "] [" + spawn.id+ "]")
+    //println("[" + spawn.id +"] ["+ field.getNextField(spawn).id + "] [" + spawn.id+ "]")
 
+
+    for (pla <- 0 until 4 ) {
+      println("Start " + pla)
+      for (_ <- 0 until 15) {
+        if (currentField.currentPawn.isEmpty) {
+          this.outputCell(currentField)
+        } else {
+          this.outputPawn(currentField.currentPawn.get)
+        }
+        currentField = field.getNextField(currentField)
+      }
+      println("")
+    }
 
   }
 
+  private def outputCell(field: model.FieldNode): Unit = {
+    if (("" + field.id).length <= 2) {
+      print("[" + field.id + " ] ")
+    } else {
+      print("[" + field.id + "] ")
+    }
+  }
 
+  private def outputPawn(pawn: model.Pawn): Unit = {
+    print("" + gameData.playerColors(pawn.player).substring(0,3) + " " + pawn.id + " ")
+  }
 }
