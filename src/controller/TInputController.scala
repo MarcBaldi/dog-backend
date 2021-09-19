@@ -91,7 +91,7 @@ class TInputController(override val gameData: GameData) extends InputController(
 
 
     for (pla <- 0 until 4 ) {
-      println("Start " + pla)
+      println("Spawn " + pla)
       for (_ <- 0 until 15) {
         if (currentField.currentPawn.isEmpty) {
           this.outputCell(currentField)
@@ -102,6 +102,30 @@ class TInputController(override val gameData: GameData) extends InputController(
       }
       println("")
     }
+
+    println("Start " + gameData.playerColors(gameData.currentPlayer))
+    for (f <- field.getGraph.keys) {
+      if (f.fieldType == model.FieldType.start && f.player.get == gameData.currentPlayer) {
+        if (f.currentPawn.isEmpty) {
+          this.outputCell(f)
+        } else {
+          this.outputPawn(f.currentPawn.get)
+        }
+      }
+    }
+    println("")
+
+    println("Goal " + gameData.playerColors(gameData.currentPlayer))
+    for (f <- field.getGraph.keys) {
+      if (f.fieldType == model.FieldType.goal && f.player.get == gameData.currentPlayer) {
+        if (f.currentPawn.isEmpty) {
+          this.outputCell(f)
+        } else {
+          this.outputPawn(f.currentPawn.get)
+        }
+      }
+    }
+    println("")
 
   }
 
