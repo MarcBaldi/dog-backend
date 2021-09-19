@@ -20,6 +20,7 @@ class NotScuffedMoveController(val gameData: GameData, withPawns: Boolean = true
     }
   }
 
+    // TODO: player may not walk into goals of the others
   def moveSimple(pawn: Pawn, card: Card): Unit = {
     val possibleFields = calcPossibleTargets(field.getField(pawn), card.getValue)
     if (possibleFields.isEmpty) {
@@ -197,13 +198,13 @@ class NotScuffedMoveController(val gameData: GameData, withPawns: Boolean = true
     true
   }
 
+  def getField: NotScuffedField = {
+    field
+  }
 
   // ###### DEBUG Operations ###
   // TODO: disable outside of dev
 
-  def getField: NotScuffedField = {
-    field
-  }
 
   def getRandomPawn: Pawn = {
     for (x <- field.getGraph)

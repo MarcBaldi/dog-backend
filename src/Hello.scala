@@ -1,5 +1,5 @@
 import com.typesafe.scalalogging.Logger
-import controller.{HardScuffedMoveController, NotScuffedMoveController}
+import controller.{HardScuffedMoveController, NotScuffedMoveController, TInputController}
 import model.{Card, Deck, GameData, HardScuffedField4, NotScuffedField, Pawn}
 
 
@@ -62,6 +62,7 @@ object Hello extends App {
   println("pawn count: "+moveC.getField.getAllPawns.size)
 
   val testPawn = moveC.getRandomPawn
+  println("pawn count: "+moveC.getField.getAllPawns.size)
 
   moveC.move(testPawn, Card(1))
   println("(1) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
@@ -95,5 +96,7 @@ object Hello extends App {
   logger.debug("Logger is working.")
   moveC.demo()
 
+  val input = new TInputController(gameData)
+  input.outputField(moveC.getField)
 
 }

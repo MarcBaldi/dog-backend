@@ -53,18 +53,19 @@ class FlowController(val gameData: GameData, inputController: InputController, c
     this.gameData.gameState = GameState.choosePawn
   }
   def handlePawn(): Unit = {
-    this.printField()
+    inputController.outputField(moveController.getField)
     val pawn = inputController.pawnInput
     moveController.move(pawn.get,currentCard.get)
+    logger.info("moved pawn "+pawn.get+ ", size is now: "+ moveController.getField.getAllPawns.size)
 
     this.gameData.gameState = GameState.postTurn
   }
   def handleTurn(): Unit = {
-    if (moveController.isPlayerFinished(0)) {
+    if (moveController.isPlayerFinished(this.gameData.currentPlayer)) {
       this.gameData.gameState = GameState.finished
-      return
+    } else {
+      this.gameData.gameState = GameState.preRound
     }
-    this.gameData.gameState = GameState.preRound
   }
   def handleFinished(): Unit = {
     // TODO:
@@ -81,10 +82,5 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   def printHand(): Unit = {
     val hand = cardController.playerHands(this.gameData.currentPlayer)
     println(hand)
-  }
-  def printField(): Unit = {
-    val field = moveController.getField
-
-    println(field)
   }
 }

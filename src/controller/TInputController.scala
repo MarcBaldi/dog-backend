@@ -47,4 +47,50 @@ class TInputController(override val gameData: GameData) extends InputController(
   }
 
 
+
+  override def outputField(field: model.NotScuffedField): Unit = {
+    //this.outputFieldV1(field)
+    this.outputFieldV2(field)
+  }
+
+  private def outputFieldV1(field: model.NotScuffedField): Unit = {
+    //val graph = field.getGraph
+    println("printing graph as Pawns:")
+    val pawns = field.getAllPawns
+    println(field.getAllPawns.size)
+
+    for (pawn <- pawns) {
+      val cField = field.getField(pawn)
+      print(cField.fieldType + " " + cField.id + "\t")
+      println(gameData.playerColors(pawn.player) + " \t"+ pawn.id)
+    }
+
+
+
+  }
+  private def outputFieldV2(field: model.NotScuffedField): Unit = {
+    val graph = field.getGraph
+    println("printing graph as Field:")
+
+    println("""
+    888888ba                     .88888.
+    88    `8b                   d8'   `88
+    88     88 .d8888b. .d8888b. 88        .d8888b. 88d8b.d8b. .d8888b.
+    88     88 88'  `88 88'  `88 88   YP88 88'  `88 88'`88'`88 88ooood8
+    88    .8P 88.  .88 88.  .88 Y8.   .88 88.  .88 88  88  88 88.  ...
+    8888888P  `88888P' `8888P88  `88888'  `88888P8 dP  dP  dP `88888P'
+                            .88
+                        d8888P
+    """)
+
+    println("m"*19*5)
+
+    val spawn = field.getSpawnField(0)
+    field.getNextField(spawn)
+    println("[" + spawn.id +"] ["+ field.getNextField(spawn).id + "] [" + spawn.id+ "]")
+
+
+  }
+
+
 }

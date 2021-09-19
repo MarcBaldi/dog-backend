@@ -19,6 +19,8 @@ case class NotScuffedField(gameData: GameData) {
     var origin: Option[FieldNode] = None
     var lastField: Option[FieldNode] = None
 
+    graph.clear()
+    logger.info("building new field")
     for (player <- 0 until  this.gameData.playerCount) {
       var playerSpawn: Option[FieldNode] = None
 

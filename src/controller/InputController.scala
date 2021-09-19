@@ -12,4 +12,8 @@ class InputController(val gameData: GameData) {
     throw new NotImplementedError()
   }
 
+  def outputField(field: model.NotScuffedField): Unit = {
+    throw new NotImplementedError()
+  }
+
 }
