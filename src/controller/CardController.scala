@@ -9,7 +9,7 @@ import scala.collection.mutable
 class CardController(val gameData: GameData) {
   var deck = new Deck()
   var playerHands: mutable.Map[Int, mutable.ArrayBuffer[Card]] = mutable.Map()
-  val logger: Logger = Logger("TInputController")
+  val logger: Logger = Logger("CardController")
 
   def init(): Unit = {
     playerHands.clear()
@@ -24,6 +24,10 @@ class CardController(val gameData: GameData) {
     for (i <- 0 to gameData.playerCount) {
       playerHands += (i -> deck.draw(cardCount))
     }
+  }
+
+  def playerHandsAreEmpty(): Boolean = {
+    this.playerHands.values.forall(it => it.isEmpty)
   }
 
 }

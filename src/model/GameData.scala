@@ -1,8 +1,12 @@
 package model
 
+import com.typesafe.scalalogging.Logger
+
 import scala.collection.mutable
 
 class GameData(val armLength: Int = 15, val playerCount: Int = 4, val pieceAmount: Int = 4)  {
+
+  val logger: Logger = Logger("GameData")
 
   var currentPlayer: Int = 0
   var currentRound: Int = 0
@@ -21,5 +25,9 @@ class GameData(val armLength: Int = 15, val playerCount: Int = 4, val pieceAmoun
       this.playerColors += ((player, col))
       player+=1
     }
+  }
+
+  def nextPlayerTurn(): Unit = {
+    this.currentPlayer = (this.currentPlayer + 1) % this.playerCount
   }
 }

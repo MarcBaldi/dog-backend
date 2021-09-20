@@ -56,8 +56,8 @@ object Hello extends App {
   println("start field count: "+count)
 
   println("Controller Move:")
-  val moveC = new NotScuffedMoveController(gameData, false)
-  moveC.getField.initTestBoard()
+  val moveC = new NotScuffedMoveController(gameData)
+  moveC.init(false)
   //moveC.printField()
   println("pawn count: "+moveC.getField.getAllPawns.size)
 

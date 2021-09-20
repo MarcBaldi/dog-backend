@@ -17,7 +17,8 @@ object GameController extends App {
 
   def initControllers(): Unit = {
     cardController.init()
-    //flowController.init()
+    flowController.init()
+    moveController.init(false)
   }
 
   def gameLoop(): Unit = {

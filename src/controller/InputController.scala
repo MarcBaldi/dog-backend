@@ -16,4 +16,8 @@ class InputController(val gameData: GameData) {
     throw new NotImplementedError()
   }
 
+  def announcePlayerTurn(): Unit = {
+    throw new NotImplementedError()
+  }
+
 }

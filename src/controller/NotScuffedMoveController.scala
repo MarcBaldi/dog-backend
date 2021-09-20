@@ -5,11 +5,15 @@ import com.typesafe.scalalogging.Logger
 import scala.collection.mutable
 import model.{Card, FieldNode, GameData, NotScuffedField, Pawn}
 
-class NotScuffedMoveController(val gameData: GameData, withPawns: Boolean = true) {
-  private val field = NotScuffedField(gameData).init(withPawns)
+class NotScuffedMoveController(val gameData: GameData) {
+  private val field = NotScuffedField(gameData)
   private val simpleCards = List(2,3,5,6,8,9,10,12)
 
   val logger: Logger = Logger("MoveController")
+
+  def init(withPawns: Boolean = true): Unit = {
+    field.init(withPawns)
+  }
 
   // ###### MOVE Operations ###
   def move(pawn: Pawn, card: Card): Unit = {

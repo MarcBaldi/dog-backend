@@ -11,7 +11,11 @@ case class NotScuffedField(gameData: GameData) {
 
   def init(withPawns: Boolean = true): NotScuffedField = {
     this.initFieldNodes()
-    if (withPawns) this.initPawns()
+    if (withPawns) {
+      this.initPawns()
+    } else {
+      this.initTestBoard()
+    }
     this
   }
 

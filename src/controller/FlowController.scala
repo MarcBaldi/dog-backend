@@ -6,14 +6,24 @@ import model.{GameData, GameState}
 class FlowController(val gameData: GameData, inputController: InputController, cardController: CardController, moveController: NotScuffedMoveController) {
 
   var currentCard: Option[model.Card] = None
+  val logger: Logger = Logger("FlowController")
 
-  val logger: Logger = Logger("TInputController")
   def init(): Unit = {
 
   }
 
   def start(): Unit = {
-
+    println("""
+    888888ba                     .88888.
+    88    `8b                   d8'   `88
+    88     88 .d8888b. .d8888b. 88        .d8888b. 88d8b.d8b. .d8888b.
+    88     88 88'  `88 88'  `88 88   YP88 88'  `88 88'`88'`88 88ooood8
+    88    .8P 88.  .88 88.  .88 Y8.   .88 88.  .88 88  88  88 88.  ...
+    8888888P  `88888P' `8888P88  `88888'  `88888P8 dP  dP  dP `88888P'
+                            .88
+                        d8888P
+    """)
+    println("m"*19*5)
   }
 
   def gameLoop(): Unit = {
@@ -47,6 +57,7 @@ class FlowController(val gameData: GameData, inputController: InputController, c
     this.gameData.gameState = GameState.chooseCard
   }
   def handleCard(): Unit = {
+    inputController.announcePlayerTurn()
     this.printHand()
     this.currentCard = inputController.cardInput
 
@@ -58,7 +69,12 @@ class FlowController(val gameData: GameData, inputController: InputController, c
     moveController.move(pawn.get,currentCard.get)
     logger.info("moved pawn "+pawn.get+ ", size is now: "+ moveController.getField.getAllPawns.size)
 
-    this.gameData.gameState = GameState.postTurn
+    if (cardController.playerHandsAreEmpty()) {
+      this.gameData.gameState = GameState.postTurn
+    } else {
+      gameData.nextPlayerTurn()
+      this.gameData.gameState = GameState.chooseCard
+    }
   }
   def handleTurn(): Unit = {
     if (moveController.isPlayerFinished(this.gameData.currentPlayer)) {

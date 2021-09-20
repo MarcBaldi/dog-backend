@@ -16,15 +16,15 @@ class TInputController(override val gameData: GameData) extends InputController(
   }
 
   override def pawnInput: Option[model.Pawn] = {
-    print("Enter the Number on your Pawn to move it: ")
+    print("Enter the Number next to your Pawn to move it: ")
     val input = intInput
     if (input.isEmpty) return None
     val allPawns = PawnFactory.getAllPawns
-    if (!allPawns.exists(p => {p.id == input.get})) {
+    if (!allPawns.exists(p => {p.id == input.get && p.player == gameData.currentPlayer})) {
       logger.error("Pawn not found!")
       return None
     }
-    if (input.isEmpty) None else Some(allPawns.filter(p=>{p.id==input.get}).head)
+    if (input.isEmpty) None else Some(allPawns.filter(p=>{p.id==input.get && p.player == gameData.currentPlayer}).head)
   }
 
 
@@ -71,19 +71,6 @@ class TInputController(override val gameData: GameData) extends InputController(
   private def outputFieldV2(field: model.NotScuffedField): Unit = {
     println("printing graph as Field:")
 
-    println("""
-    888888ba                     .88888.
-    88    `8b                   d8'   `88
-    88     88 .d8888b. .d8888b. 88        .d8888b. 88d8b.d8b. .d8888b.
-    88     88 88'  `88 88'  `88 88   YP88 88'  `88 88'`88'`88 88ooood8
-    88    .8P 88.  .88 88.  .88 Y8.   .88 88.  .88 88  88  88 88.  ...
-    8888888P  `88888P' `8888P88  `88888'  `88888P8 dP  dP  dP `88888P'
-                            .88
-                        d8888P
-    """)
-
-    println("m"*19*5)
-
     val spawn = field.getSpawnField(0)
     var currentField = spawn
     field.getNextField(spawn)
@@ -129,6 +116,12 @@ class TInputController(override val gameData: GameData) extends InputController(
 
   }
 
+  override def announcePlayerTurn(): Unit = {
+    println("Now it´s your turn: " + gameData.playerColors(gameData.currentPlayer))
+  }
+
+
+  // ##### Private functions
   private def outputCell(field: model.FieldNode): Unit = {
     if (("" + field.id).length <= 2) {
       print("[" + field.id + " ] ")
