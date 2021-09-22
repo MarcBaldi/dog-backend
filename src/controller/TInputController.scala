@@ -27,6 +27,28 @@ class TInputController(override val gameData: GameData) extends InputController(
     if (input.isEmpty) None else Some(allPawns.filter(p=>{p.id==input.get && p.player == gameData.currentPlayer}).head)
   }
 
+  override def outputField(field: model.NotScuffedField): Unit = {
+    //this.outputFieldV1(field)
+    this.outputFieldV2(field)
+  }
+
+  override def announcePlayerTurn(): Unit = {
+    println("Now it´s your turn: " + gameData.playerColors(gameData.currentPlayer))
+  }
+
+  override def announceJokerMessage(): Unit = {
+    println("Which card should the Joker be? Enter the ID")
+    for (c <- 0 until 14) {
+      val card = model.Card(c)
+      print(card.getValue + ": ")
+      println(card.getDescription)
+    }
+  }
+
+
+
+
+  // ##### Private functions
 
   private def intInput: Option[Int] = {
     val input: Int = try {
@@ -46,12 +68,6 @@ class TInputController(override val gameData: GameData) extends InputController(
     Some(input)
   }
 
-
-
-  override def outputField(field: model.NotScuffedField): Unit = {
-    //this.outputFieldV1(field)
-    this.outputFieldV2(field)
-  }
 
   private def outputFieldV1(field: model.NotScuffedField): Unit = {
     //val graph = field.getGraph
@@ -116,12 +132,6 @@ class TInputController(override val gameData: GameData) extends InputController(
 
   }
 
-  override def announcePlayerTurn(): Unit = {
-    println("Now it´s your turn: " + gameData.playerColors(gameData.currentPlayer))
-  }
-
-
-  // ##### Private functions
   private def outputCell(field: model.FieldNode): Unit = {
     if (("" + field.id).length <= 2) {
       print("[" + field.id + " ] ")

@@ -20,4 +20,8 @@ class InputController(val gameData: GameData) {
     throw new NotImplementedError()
   }
 
+  def announceJokerMessage(): Unit = {
+    throw new NotImplementedError()
+  }
+
 }

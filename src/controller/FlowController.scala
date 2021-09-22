@@ -1,11 +1,13 @@
 package controller
 
 import com.typesafe.scalalogging.Logger
-import model.{GameData, GameState}
+import model.{Card, FieldNode, GameData, GameState, Pawn}
 
 class FlowController(val gameData: GameData, inputController: InputController, cardController: CardController, moveController: NotScuffedMoveController) {
 
-  var currentCard: Option[model.Card] = None
+  var chosenCard: Option[Card] = None
+  var chosenPawn: Option[Pawn] = None
+  var chosenField: Option[FieldNode] = None
   val logger: Logger = Logger("FlowController")
 
   def init(): Unit = {
@@ -38,7 +40,10 @@ class FlowController(val gameData: GameData, inputController: InputController, c
       case GameState.init => this.handleInit()
       case GameState.preRound => this.handleRound()
       case GameState.chooseCard => this.handleCard()
+      case GameState.chooseCardJ => this.handleCardJ() //joker
       case GameState.choosePawn => this.handlePawn()
+      case GameState.choosePawn2 => this.handlePawn2() //11
+      case GameState.choosePawns => this.handlePawns() //7
       case GameState.postTurn => this.handleTurn()
       case GameState.finished => this.handleFinished()
       case GameState.end => this.handleEnd()
@@ -59,17 +64,37 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   def handleCard(): Unit = {
     inputController.announcePlayerTurn()
     this.printHand()
-    this.currentCard = inputController.cardInput
+    this.chosenCard = inputController.cardInput
+
+    if (chosenCard.contains(Card(7))) {
+      this.gameData.gameState = GameState.choosePawns
+    } else if (chosenCard.contains(Card(11))) {
+      this.gameData.gameState = GameState.choosePawn2
+    } else if (chosenCard.contains(Card(0))) {
+      this.gameData.gameState = GameState.chooseCardJ
+    } else {
+      this.gameData.gameState = GameState.choosePawn
+    }
+  }
+  def handleCardJ(): Unit = {
+    inputController.announceJokerMessage()
+    val chosenCardJ = inputController.cardInput
+    if (chosenCard.isEmpty) {
+      throw new Exception("No Card chosen")
+    }
+
+    this.chosenCard = this.cardController.transformJokerCard(gameData.currentPlayer, chosenCardJ.get)
 
     this.gameData.gameState = GameState.choosePawn
+
   }
   def handlePawn(): Unit = {
     inputController.outputField(moveController.getField)
     val pawn = inputController.pawnInput
-    moveController.move(pawn.get,currentCard.get)
+    moveController.move(pawn.get,chosenCard.get)
     logger.info("moved pawn "+pawn.get+ ", size is now: "+ moveController.getField.getAllPawns.size)
 
-    if (cardController.playerHandsAreEmpty()) {
+    if (cardController.arePlayerHandsEmpty()) {
       this.gameData.gameState = GameState.postTurn
     } else {
       gameData.nextPlayerTurn()

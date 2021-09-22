@@ -2,7 +2,7 @@ package controller
 
 import com.typesafe.scalalogging.Logger
 import javafx.util.Pair
-import model.{Card, Deck, GameData}
+import model.{Card, Deck, GameData, Player}
 
 import scala.collection.mutable
 
@@ -26,8 +26,16 @@ class CardController(val gameData: GameData) {
     }
   }
 
-  def playerHandsAreEmpty(): Boolean = {
+  def arePlayerHandsEmpty(): Boolean = {
     this.playerHands.values.forall(it => it.isEmpty)
   }
 
+  def transformJokerCard(player: Int, targetCard: Card): Option[Card] = {
+    if (!this.playerHands(player).contains(Card(0))) {
+      throw new Exception("No Joker found")
+    }
+    this.playerHands(player).-=(Card(0))
+    this.playerHands(player).+=(targetCard)
+    Some(targetCard)
+  }
 }

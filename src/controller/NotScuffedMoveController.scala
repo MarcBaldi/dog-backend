@@ -35,7 +35,7 @@ class NotScuffedMoveController(val gameData: GameData) {
       println("Did not move:" + pawn)
       return
       // TODO: must be prevented by ifCardPlayable
-      throw new Exception("Could not move. no move with card: " + card + " and pawn: " + pawn + " in field: " + getField.getField(pawn))
+      // throw new Exception("Could not move. no move with card: " + card + " and pawn: " + pawn + " in field: " + getField.getField(pawn))
     }
     // TODO: remove this, add input for goal
     for (step <- possibleFields) {
