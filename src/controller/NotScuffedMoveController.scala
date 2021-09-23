@@ -57,7 +57,7 @@ class NotScuffedMoveController(val gameData: GameData) {
       this.move7(pawn)
 
     } else if (card.getValue == 11) {
-      this.move11(pawn)
+      this.move11(pawn, pawn)
 
     } else if (card.getValue == 13) {
       this.move13(pawn)
@@ -140,15 +140,13 @@ class NotScuffedMoveController(val gameData: GameData) {
     this.move(pawn, Card(input))
   }
 
-  def move11(pawn: Pawn): Unit = {
-    // BOOBA
-    // TODO: input second pawn
-    val input = getRandomPawn
-    field.swapPawns(pawn, pawn)
+  // BOOBA
+  def move11(pawn1: Pawn, pawn2: Pawn): Unit = {
+    field.swapPawns(pawn1, pawn2)
   }
 
+  // KING
   def move13(pawn: Pawn): Unit = {
-    // KING
     // TODO: input 13, spawn
     val input = 1
     if (input == 13) {

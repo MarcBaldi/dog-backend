@@ -30,4 +30,10 @@ class GameData(val armLength: Int = 15, val playerCount: Int = 4, val pieceAmoun
   def nextPlayerTurn(): Unit = {
     this.currentPlayer = (this.currentPlayer + 1) % this.playerCount
   }
+
+  def getAllyPlayer(player: Int): Int = {
+    val allyPlayer = player + (this.playerCount * 2) % this.playerCount
+    logger.info("Calculated Ally of " + player + ": " + allyPlayer)
+    allyPlayer
+  }
 }

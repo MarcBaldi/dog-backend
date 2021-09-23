@@ -2,6 +2,7 @@ package controller
 
 import com.typesafe.scalalogging.Logger
 import model.{Card, FieldNode, GameData, GameState, Pawn}
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 class FlowController(val gameData: GameData, inputController: InputController, cardController: CardController, moveController: NotScuffedMoveController) {
 
@@ -29,7 +30,7 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   }
 
   def gameLoop(): Unit = {
-    while (true) {
+    while (gameData.gameState != GameState.end) {
       this.gameTick()
     }
   }
@@ -46,7 +47,6 @@ class FlowController(val gameData: GameData, inputController: InputController, c
       case GameState.choosePawns => this.handlePawns() //7
       case GameState.postTurn => this.handleTurn()
       case GameState.finished => this.handleFinished()
-      case GameState.end => this.handleEnd()
     }
   }
   // TODO: error handling
@@ -54,6 +54,7 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   def handleInit(): Unit = {
     this.gameData.gameState = GameState.preRound
   }
+
   def handleRound(): Unit = {
     val cardCount = this.defineCardCount(this.gameData.currentRound)
     cardController.drawHands(cardCount)
@@ -61,9 +62,11 @@ class FlowController(val gameData: GameData, inputController: InputController, c
 
     this.gameData.gameState = GameState.chooseCard
   }
+
   def handleCard(): Unit = {
     inputController.announcePlayerTurn()
-    this.printHand()
+    val hand = cardController.playerHands(this.gameData.currentPlayer)
+    inputController.outputCards(hand)
     this.chosenCard = inputController.cardInput
 
     if (chosenCard.contains(Card(7))) {
@@ -76,52 +79,79 @@ class FlowController(val gameData: GameData, inputController: InputController, c
       this.gameData.gameState = GameState.choosePawn
     }
   }
+
+  // Joker
   def handleCardJ(): Unit = {
     inputController.announceJokerMessage()
     val chosenCardJ = inputController.cardInput
     if (chosenCard.isEmpty) {
       throw new Exception("No Card chosen")
     }
+    if (chosenCard.contains(Card(0))) {
+      throw new Exception("Cannot choose Joker")
+    }
 
     this.chosenCard = this.cardController.transformJokerCard(gameData.currentPlayer, chosenCardJ.get)
-
     this.gameData.gameState = GameState.choosePawn
-
   }
+
   def handlePawn(): Unit = {
     inputController.outputField(moveController.getField)
     val pawn = inputController.pawnInput
-    moveController.move(pawn.get,chosenCard.get)
-    logger.info("moved pawn "+pawn.get+ ", size is now: "+ moveController.getField.getAllPawns.size)
+    moveController.move(pawn.get, chosenCard.get)
 
-    if (cardController.arePlayerHandsEmpty()) {
-      this.gameData.gameState = GameState.postTurn
+    logger.info("moved pawn "+pawn.get+ ", size is now: "+ moveController.getField.getAllPawns.size)
+    this.gameData.gameState = GameState.postTurn
+  }
+
+  // 11
+  def handlePawn2(): Unit = {
+    val pawnSelf = inputController.pawnInput
+    val pawnOther = inputController.pawnInput
+    moveController.move11(pawnSelf.get, pawnOther.get)
+
+    logger.info("moved pawns "+pawnSelf.get + " + "+pawnOther.get)
+    this.gameData.gameState = GameState.postTurn
+  }
+
+  // 7
+  def handlePawns(): Unit = {
+    // TODO:
+    throw new NotImplementedException
+  }
+
+  def handleTurn(): Unit = {
+    if (moveController.isPlayerFinished(this.gameData.currentPlayer)) {
+      this.gameData.gameState = GameState.finished
+    } else if (cardController.arePlayerHandsEmpty()) {
+      gameData.nextPlayerTurn()
+      this.gameData.gameState = GameState.preRound
     } else {
       gameData.nextPlayerTurn()
       this.gameData.gameState = GameState.chooseCard
     }
   }
-  def handleTurn(): Unit = {
-    if (moveController.isPlayerFinished(this.gameData.currentPlayer)) {
-      this.gameData.gameState = GameState.finished
-    } else {
+
+  def handleFinished(): Unit = {
+    inputController.announceFinishedMessage(this.gameData.currentPlayer)
+    if (moveController.isPlayerFinished(this.gameData.getAllyPlayer(this.gameData.currentPlayer))) {
+      inputController.announceEndMessage(this.gameData.currentPlayer)
+      this.gameData.gameState = GameState.end
+    }
+    // TODO: make Pawns of ally movable for currentPlayer
+
+    gameData.nextPlayerTurn()
+    if (cardController.arePlayerHandsEmpty()) {
       this.gameData.gameState = GameState.preRound
+    } else {
+      this.gameData.gameState = GameState.chooseCard
     }
   }
-  def handleFinished(): Unit = {
-    // TODO:
-  }
-  def handleEnd(): Unit = {
-    // TODO:
-  }
 
-  // Helpers
+  // ####### Helpers
   def defineCardCount(currentRound: Int): Int = {
-    logger.info("calcCards: " + (6 - (currentRound % 5)))
-    6 - (currentRound % 5)
-  }
-  def printHand(): Unit = {
-    val hand = cardController.playerHands(this.gameData.currentPlayer)
-    println(hand)
+    val result = 6 - (currentRound % 5)
+    logger.info("calcCards: " + result)
+    result
   }
 }

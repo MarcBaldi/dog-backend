@@ -3,6 +3,7 @@ package controller
 import com.typesafe.scalalogging.Logger
 import model.{GameData, PawnFactory}
 
+import scala.collection.mutable.ArrayBuffer
 import scala.io.StdIn.readInt
 
 class TInputController(override val gameData: GameData) extends InputController(gameData) {
@@ -32,20 +33,31 @@ class TInputController(override val gameData: GameData) extends InputController(
     this.outputFieldV2(field)
   }
 
+  override def outputCards(hand: ArrayBuffer[model.Card]): Unit = {
+    println(hand.mkString("Cards: ", ", ", ""))
+  }
+
   override def announcePlayerTurn(): Unit = {
     println("Now it´s your turn: " + gameData.playerColors(gameData.currentPlayer))
   }
 
   override def announceJokerMessage(): Unit = {
     println("Which card should the Joker be? Enter the ID")
-    for (c <- 0 until 14) {
+    for (c <- 1 until 14) {
       val card = model.Card(c)
       print(card.getValue + ": ")
       println(card.getDescription)
     }
   }
 
+  override def announceFinishedMessage(player: Int): Unit = {
+    println("Player " + gameData.playerColors(player) + " has finished!")
+    println("Allied pawns have been made available.")
+  }
 
+  override def announceEndMessage(player: Int): Unit = {
+    println("Player " + gameData.playerColors(player) + " and " + gameData.playerColors(gameData.getAllyPlayer(player)) + " have won!!!")
+  }
 
 
   // ##### Private functions
