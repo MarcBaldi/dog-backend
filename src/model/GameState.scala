@@ -14,6 +14,7 @@ object GameState extends Enumeration
   val choosePawn2: model.GameState.Value = Value("choose second pawn") // swap pawns
   val choosePawns: model.GameState.Value = Value("choose pawns") // 7
   val chooseField: model.GameState.Value = Value("choose field")
+  val chooseFields: model.GameState.Value = Value("choose fields") // 7
   val postTurn: model.GameState.Value = Value("post turn")
   val finished: model.GameState.Value = Value("finished")
   val end: model.GameState.Value = Value("end")

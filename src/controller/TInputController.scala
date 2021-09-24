@@ -28,6 +28,16 @@ class TInputController(override val gameData: GameData) extends InputController(
     if (input.isEmpty) None else Some(allPawns.filter(p=>{p.id==input.get && p.player == gameData.currentPlayer}).head)
   }
 
+  override def fieldInput: Option[Int] = {
+    print("Enter the Number on the Field to choose it: ")
+    intInput
+  }
+
+  override def outputPossibleFields(fields: ArrayBuffer[model.FieldNode]): Unit = {
+    //this.outputFieldV1(field)
+    // TODO: implement this!
+  }
+  
   override def outputField(field: model.NotScuffedField): Unit = {
     //this.outputFieldV1(field)
     this.outputFieldV2(field)

@@ -9,6 +9,7 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   var chosenCard: Option[Card] = None
   var chosenPawn: Option[Pawn] = None
   var chosenField: Option[FieldNode] = None
+  var turn7: Option[Int] = None
   val logger: Logger = Logger("FlowController")
 
   def init(): Unit = {
@@ -39,13 +40,15 @@ class FlowController(val gameData: GameData, inputController: InputController, c
     logger.info("Launching tick: " + gameData.gameState)
     gameData.gameState match  {
       case GameState.init => this.handleInit()
-      case GameState.preRound => this.handleRound()
+      case GameState.preRound => this.handleStartOfRound()
       case GameState.chooseCard => this.handleCard()
       case GameState.chooseCardJ => this.handleCardJ() //joker
       case GameState.choosePawn => this.handlePawn()
       case GameState.choosePawn2 => this.handlePawn2() //11
       case GameState.choosePawns => this.handlePawns() //7
-      case GameState.postTurn => this.handleTurn()
+      case GameState.chooseField => this.handleField()
+      case GameState.chooseFields => this.handleFields() // 7
+      case GameState.postTurn => this.handleEndOfTurn()
       case GameState.finished => this.handleFinished()
     }
   }
@@ -55,7 +58,7 @@ class FlowController(val gameData: GameData, inputController: InputController, c
     this.gameData.gameState = GameState.preRound
   }
 
-  def handleRound(): Unit = {
+  def handleStartOfRound(): Unit = {
     val cardCount = this.defineCardCount(this.gameData.currentRound)
     cardController.drawHands(cardCount)
     // TODO: allies swap a card
@@ -97,11 +100,8 @@ class FlowController(val gameData: GameData, inputController: InputController, c
 
   def handlePawn(): Unit = {
     inputController.outputField(moveController.getField)
-    val pawn = inputController.pawnInput
-    moveController.move(pawn.get, chosenCard.get)
-
-    logger.info("moved pawn "+pawn.get+ ", size is now: "+ moveController.getField.getAllPawns.size)
-    this.gameData.gameState = GameState.postTurn
+    this.chosenPawn = inputController.pawnInput
+    this.gameData.gameState = GameState.chooseField
   }
 
   // 11
@@ -120,7 +120,21 @@ class FlowController(val gameData: GameData, inputController: InputController, c
     throw new NotImplementedException
   }
 
-  def handleTurn(): Unit = {
+  def handleField(): Unit = {
+    val field = inputController.fieldInput
+    moveController.move(this.chosenPawn.get, field.get)
+
+    logger.info("moved pawn " + chosenPawn.get + " to: " + field.get)
+    this.gameData.gameState = GameState.postTurn
+  }
+
+  // 7
+  def handleFields(): Unit = {
+    // TODO:
+    throw new NotImplementedException
+  }
+
+  def handleEndOfTurn(): Unit = {
     if (moveController.isPlayerFinished(this.gameData.currentPlayer)) {
       this.gameData.gameState = GameState.finished
     } else if (cardController.arePlayerHandsEmpty()) {

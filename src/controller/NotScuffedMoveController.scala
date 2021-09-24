@@ -16,6 +16,29 @@ class NotScuffedMoveController(val gameData: GameData) {
   }
 
   // ###### MOVE Operations ###
+  def move(pawn: Pawn, newField: FieldNode): Unit = {
+    if (newField.currentPawn.nonEmpty) {
+      field.sendPawnHome(newField.currentPawn.get)
+    }
+    field.movePawn(pawn, newField)
+  }
+
+  // Convenient method
+  def move(pawn: Pawn, newField: Int): Unit = {
+    val newFieldField = field.getGraph.keys.find(f => f.id == newField)
+    if (newFieldField.nonEmpty) {
+      this.move(pawn, newFieldField.get)
+    } else {
+      logger.error("Pawn " + pawn + " could not move to FieldId " + newField + ". Could not find field.")
+      throw new Exception("Could not move Pawn")
+    }
+  }
+
+  /**
+   * @deprecated do not use this method !
+   * @param pawn -
+   * @param card -
+   */
   def move(pawn: Pawn, card: Card): Unit = {
     if (isSimpleCard(card)) {
       moveSimple(pawn, card)
@@ -48,7 +71,7 @@ class NotScuffedMoveController(val gameData: GameData) {
 
   def moveComplex(pawn: Pawn, card: Card): Unit = {
     if (card.getValue == 1) {
-      this.move1(pawn)
+      //this.move1(pawn)
 
     } else if (card.getValue == 4) {
       this.move4(pawn)
@@ -108,18 +131,11 @@ class NotScuffedMoveController(val gameData: GameData) {
     targets
   }
 
-  def move1(pawn: Pawn): Unit = {
-    // ASS
-    // TODO: input 1,11,spawn
-    val input = 1
-    if (input == 1 || input == 11) {
-      val possibleFields = calcPossibleTargets(field.getField(pawn), input)
-      field.movePawn(pawn, possibleFields.head)
-    } else {
-      field.sendPawnOnField(pawn)
-    }
-  }
 
+  /**
+   * @deprecated do not use this method !
+   * @param pawn -
+   */
   def move4(pawn: Pawn): Unit = {
     // TODO: input 4,-4
     val input = -4
@@ -134,6 +150,10 @@ class NotScuffedMoveController(val gameData: GameData) {
     field.movePawn(pawn, possibleFields.head)
   }
 
+  /**
+   * @deprecated do not use this method !
+   * @param pawn -
+   */
   def move7(pawn: Pawn): Unit = {
     // TODO: input single pawns
     val input = 1 // ??
@@ -146,6 +166,10 @@ class NotScuffedMoveController(val gameData: GameData) {
   }
 
   // KING
+  /**
+   * @deprecated do not use this method !
+   * @param pawn -
+   */
   def move13(pawn: Pawn): Unit = {
     // TODO: input 13, spawn
     val input = 1
@@ -157,6 +181,10 @@ class NotScuffedMoveController(val gameData: GameData) {
     }
   }
 
+  /**
+   * @deprecated do not use this method !
+   * @param pawn -
+   */
   def move14(pawn: Pawn): Unit = {
     // JOKER
     // TODO: input 1,2,3,4,5,6,7,8,9,10,11,12,13
@@ -175,10 +203,19 @@ class NotScuffedMoveController(val gameData: GameData) {
     true
   }
 
+  /**
+   * @deprecated do not use this method !
+   * @param pawn -
+   * @param card -
+   */
   def isSimpleMove(pawn: Pawn, card: Card): Boolean = {
      isSimpleCard(card) && !hasCardChoicesNow(pawn, card)
   }
 
+  /**
+   * @deprecated do not use this method !
+   * @param card -
+   */
   def isSimpleCard(card: Card): Boolean = {
     simpleCards.contains(card.getValue)
   }

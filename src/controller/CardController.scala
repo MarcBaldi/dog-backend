@@ -9,6 +9,7 @@ import scala.collection.mutable
 class CardController(val gameData: GameData) {
   var deck = new Deck()
   var playerHands: mutable.Map[Int, mutable.ArrayBuffer[Card]] = mutable.Map()
+  private val simpleCards = List(2,3,5,6,8,9,10,12)
   val logger: Logger = Logger("CardController")
 
   def init(): Unit = {
@@ -37,5 +38,9 @@ class CardController(val gameData: GameData) {
     this.playerHands(player).-=(Card(0))
     this.playerHands(player).+=(targetCard)
     Some(targetCard)
+  }
+
+  def isSimpleCard(card: Card): Boolean = {
+    simpleCards.contains(card.getValue)
   }
 }

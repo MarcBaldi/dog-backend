@@ -165,31 +165,70 @@ case class NotScuffedField(gameData: GameData) {
     for (_ <- 0 until 4) {
       field = this.getNextField(field)
     }
+    pawn = PawnFactory.createPawn(0)
+    field.currentPawn = pawn
+
+    for (_ <- 0 until 2) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(0)
+    field.currentPawn = pawn
+
+    for (_ <- 0 until 8) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(0)
+    field.currentPawn = pawn
+
+    // next player
+    PawnFactory.resetPawns()
+
+    for (_ <- 0 until 5) {
+      field = this.getNextField(field)
+    }
     pawn = PawnFactory.createPawn(1)
     field.currentPawn = pawn
 
     for (_ <- 0 until 2) {
       field = this.getNextField(field)
     }
-    pawn = PawnFactory.createPawn(2)
+    pawn = PawnFactory.createPawn(1)
     field.currentPawn = pawn
 
     for (_ <- 0 until 8) {
       field = this.getNextField(field)
     }
-    pawn = PawnFactory.createPawn(3)
+    pawn = PawnFactory.createPawn(1)
     field.currentPawn = pawn
+
+    for (_ <- 0 until 1) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(1)
+    field.currentPawn = pawn
+
+    // next player
+    PawnFactory.resetPawns()
 
     for (_ <- 0 until 5) {
       field = this.getNextField(field)
     }
-    pawn = PawnFactory.createPawn(0)
+    pawn = PawnFactory.createPawn(2)
     field.currentPawn = pawn
 
     for (_ <- 0 until 6) {
       field = this.getNextField(field)
     }
-    pawn = PawnFactory.createPawn(1)
+    pawn = PawnFactory.createPawn(2)
+    field.currentPawn = pawn
+
+    // next player
+    PawnFactory.resetPawns()
+
+    for (_ <- 0 until 5) {
+      field = this.getNextField(field)
+    }
+    pawn = PawnFactory.createPawn(3)
     field.currentPawn = pawn
 
     // TODO: Maybe add some more, and encapsulate
