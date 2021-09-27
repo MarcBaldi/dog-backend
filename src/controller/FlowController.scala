@@ -32,7 +32,11 @@ class FlowController(val gameData: GameData, inputController: InputController, c
 
   def gameLoop(): Unit = {
     while (gameData.gameState != GameState.end) {
-      this.gameTick()
+      try {
+        this.gameTick()
+      } catch {
+        case e: Exception => logger.error("logged ex:", e)
+      }
     }
   }
 
@@ -116,11 +120,32 @@ class FlowController(val gameData: GameData, inputController: InputController, c
 
   // 7
   def handlePawns(): Unit = {
-    // TODO:
-    throw new NotImplementedException
+    this.turn7 match {
+      case None => {
+        // TODO: save game state & restore when Ex
+        inputController.outputField(moveController.getField)
+        this.chosenPawn = inputController.pawnInput
+
+        val field = inputController.fieldInput
+        moveController.move(this.chosenPawn.get, field.get)
+
+        this.turn7 = Some(1)
+      }
+      case Some(6) => {
+        //last turn
+
+        this.turn7 = None
+        this.gameData.gameState = GameState.postTurn
+      }
+      case Some(turn) => {
+
+        this.turn7 = Some(turn + 1)
+      }
+    }
   }
 
   def handleField(): Unit = {
+    inputController.outputPossibleFields(moveController.calcPossibleTargets(moveController.getField.getField(this.chosenPawn.get), this.chosenCard.get.getValue).toArray)
     val field = inputController.fieldInput
     moveController.move(this.chosenPawn.get, field.get)
 

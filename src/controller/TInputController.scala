@@ -34,10 +34,14 @@ class TInputController(override val gameData: GameData) extends InputController(
   }
 
   override def outputPossibleFields(fields: ArrayBuffer[model.FieldNode]): Unit = {
-    //this.outputFieldV1(field)
-    // TODO: implement this!
+    println("Possible fields to move to:")
+
+    for (field <- fields) {
+      print(field.fieldType + " " + field.id + "\t")
+    }
+    println("")
   }
-  
+
   override def outputField(field: model.NotScuffedField): Unit = {
     //this.outputFieldV1(field)
     this.outputFieldV2(field)
