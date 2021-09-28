@@ -33,6 +33,7 @@ class CardController(val gameData: GameData) {
 
   def transformJokerCard(player: Int, targetCard: Card): Option[Card] = {
     if (!this.playerHands(player).contains(Card(0))) {
+      logger.error(playerHands(player).toString())
       throw new Exception("No Joker found")
     }
     this.playerHands(player).-=(Card(0))

@@ -4,6 +4,8 @@ import com.typesafe.scalalogging.Logger
 import model.{Card, FieldNode, GameData, GameState, Pawn}
 import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
+import scala.collection.mutable
+
 class FlowController(val gameData: GameData, inputController: InputController, cardController: CardController, moveController: NotScuffedMoveController) {
 
   var chosenCard: Option[Card] = None
@@ -36,6 +38,8 @@ class FlowController(val gameData: GameData, inputController: InputController, c
         this.gameTick()
       } catch {
         case e: Exception => logger.error("logged ex:", e)
+          logger.info("resetting Turn...")
+          this.resetTurn();
       }
     }
   }
@@ -71,6 +75,7 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   }
 
   def handleCard(): Unit = {
+    inputController.outputField(moveController.getField)
     inputController.announcePlayerTurn()
     val hand = cardController.playerHands(this.gameData.currentPlayer)
     inputController.outputCards(hand)
@@ -91,15 +96,24 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   def handleCardJ(): Unit = {
     inputController.announceJokerMessage()
     val chosenCardJ = inputController.cardInput
-    if (chosenCard.isEmpty) {
+    if (chosenCardJ.isEmpty) {
       throw new Exception("No Card chosen")
     }
-    if (chosenCard.contains(Card(0))) {
+    if (chosenCardJ.contains(Card(0))) {
       throw new Exception("Cannot choose Joker")
     }
 
     this.chosenCard = this.cardController.transformJokerCard(gameData.currentPlayer, chosenCardJ.get)
-    this.gameData.gameState = GameState.choosePawn
+
+    if (chosenCard.contains(Card(7))) {
+      this.gameData.gameState = GameState.choosePawns
+    } else if (chosenCard.contains(Card(11))) {
+      this.gameData.gameState = GameState.choosePawn2
+    } else if (chosenCard.contains(Card(0))) {
+      this.gameData.gameState = GameState.chooseCardJ
+    } else {
+      this.gameData.gameState = GameState.choosePawn
+    }
   }
 
   def handlePawn(): Unit = {
@@ -111,45 +125,46 @@ class FlowController(val gameData: GameData, inputController: InputController, c
   // 11
   def handlePawn2(): Unit = {
     val pawnSelf = inputController.pawnInput
-    val pawnOther = inputController.pawnInput
+    val pawnOther = inputController.pawnInputOther
     moveController.move11(pawnSelf.get, pawnOther.get)
 
-    logger.info("moved pawns "+pawnSelf.get + " + "+pawnOther.get)
+    logger.info("moved pawns " + pawnSelf.get + " + " + pawnOther.get)
     this.gameData.gameState = GameState.postTurn
   }
 
   // 7
   def handlePawns(): Unit = {
+
+    inputController.outputField(moveController.getField)
+    val chosenPawn = inputController.pawnInput
+    val fieldOfPawn = moveController.getField.getField(chosenPawn.get)
+    val possible = moveController.calcPossibleTargets(fieldOfPawn, 1)
+    inputController.outputPossibleFields(new mutable.ArrayBuffer[FieldNode]().++(possible))
+    val chosenField = inputController.fieldInput
+    moveController.move(chosenPawn.get, chosenField.get)
+
     this.turn7 match {
-      case None => {
+      case None =>
         // TODO: save game state & restore when Ex
-        inputController.outputField(moveController.getField)
-        this.chosenPawn = inputController.pawnInput
-
-        val field = inputController.fieldInput
-        moveController.move(this.chosenPawn.get, field.get)
-
         this.turn7 = Some(1)
-      }
-      case Some(6) => {
+      case Some(7) =>
         //last turn
-
         this.turn7 = None
         this.gameData.gameState = GameState.postTurn
-      }
-      case Some(turn) => {
-
+      case Some(turn) =>
         this.turn7 = Some(turn + 1)
-      }
     }
   }
 
   def handleField(): Unit = {
-    inputController.outputPossibleFields(moveController.calcPossibleTargets(moveController.getField.getField(this.chosenPawn.get), this.chosenCard.get.getValue).toArray)
-    val field = inputController.fieldInput
-    moveController.move(this.chosenPawn.get, field.get)
+    val fieldOfPawn = moveController.getField.getField(this.chosenPawn.get)
+    val possible = moveController.calcPossibleTargets(fieldOfPawn, this.chosenCard.get.getValue)
+    inputController.outputPossibleFields(new mutable.ArrayBuffer[FieldNode]().++(possible))
+    val chosenField = inputController.fieldInput
 
-    logger.info("moved pawn " + chosenPawn.get + " to: " + field.get)
+    moveController.move(this.chosenPawn.get, chosenField.get)
+
+    logger.info("moved pawn " + chosenPawn.get + " to: " + chosenField.get)
     this.gameData.gameState = GameState.postTurn
   }
 
@@ -192,5 +207,13 @@ class FlowController(val gameData: GameData, inputController: InputController, c
     val result = 6 - (currentRound % 5)
     logger.info("calcCards: " + result)
     result
+  }
+
+  def resetTurn(): Unit = {
+    chosenCard  = None
+    chosenPawn = None
+    chosenField = None
+    turn7 = None
+    this.gameData.gameState = GameState.chooseCard
   }
 }

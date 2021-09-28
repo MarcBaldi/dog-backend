@@ -24,4 +24,11 @@ case class Card(id: Int) {
   }
 
   override def toString: String = this.getDescription
+
+  override def equals(card: Any): Boolean = {
+    card match {
+      case c: Card => this.getValue.equals(c.getValue)
+      case _ => false
+    }
+  }
 }

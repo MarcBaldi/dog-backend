@@ -112,7 +112,7 @@ case class NotScuffedField(gameData: GameData) {
   // ###### HELPER Operations ###
   def getField(pawn: Pawn): FieldNode = {
     for (field <- graph.keys) {
-      if (field.currentPawn.nonEmpty && field.currentPawn.get == pawn) {
+      if (field.currentPawn.contains(pawn)) {
         return field
       }
     }

@@ -11,6 +11,8 @@ abstract class InputController(val gameData: GameData) {
 
   def pawnInput: Option[model.Pawn]
 
+  def pawnInputOther: Option[model.Pawn]
+
   def fieldInput: Option[Int]
 
   def outputPossibleFields(fields: ArrayBuffer[model.FieldNode]): Unit

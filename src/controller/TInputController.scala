@@ -28,6 +28,21 @@ class TInputController(override val gameData: GameData) extends InputController(
     if (input.isEmpty) None else Some(allPawns.filter(p=>{p.id==input.get && p.player == gameData.currentPlayer}).head)
   }
 
+  override def pawnInputOther: Option[model.Pawn] = {
+    print("Enter the Number next to a Pawn that does not belong to you: ")
+    val inputPawn = intInput
+    if (inputPawn.isEmpty) return None
+    print("Which player does this pawn belog to: ")
+    val inputPlayer = intInput
+    if (inputPlayer.isEmpty) return None
+    val allPawns = PawnFactory.getAllPawns
+    if (!allPawns.exists(p => {p.id == inputPawn.get && p.player == inputPlayer.get})) {
+      logger.error("Pawn not found!")
+      return None
+    }
+    Some(allPawns.filter(p=>{p.id==inputPawn.get && p.player == inputPlayer.get}).head)
+  }
+
   override def fieldInput: Option[Int] = {
     print("Enter the Number on the Field to choose it: ")
     intInput
