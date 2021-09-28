@@ -63,7 +63,7 @@ object Hello extends App {
 
   val testPawn = moveC.getRandomPawn
   println("pawn count: "+moveC.getField.getAllPawns.size)
-
+/*
   moveC.move(testPawn, Card(1))
   println("(1) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
   moveC.move(testPawn, Card(2))
@@ -92,7 +92,7 @@ object Hello extends App {
   println("(14) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
   moveC.move(testPawn, Card(7))
   println("(7) moved:" + testPawn + " to: " + moveC.getField.getField(testPawn))
-
+*/
   logger.debug("Logger is working.")
   moveC.demo()
 

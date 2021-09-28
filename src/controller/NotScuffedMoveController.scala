@@ -34,77 +34,34 @@ class NotScuffedMoveController(val gameData: GameData) {
     }
   }
 
-  /**
-   * @deprecated do not use this method !
-   * @param pawn -
-   * @param card -
-   */
-  def move(pawn: Pawn, card: Card): Unit = {
-    if (isSimpleCard(card)) {
-      moveSimple(pawn, card)
-    } else {
-      moveComplex(pawn, card)
-    }
+  // BOOBA
+  def move11(pawn1: Pawn, pawn2: Pawn): Unit = {
+    field.swapPawns(pawn1, pawn2)
   }
 
-    // TODO: player may not walk into goals of the others
-  def moveSimple(pawn: Pawn, card: Card): Unit = {
-    val possibleFields = calcPossibleTargets(field.getField(pawn), card.getValue)
-    if (possibleFields.isEmpty) {
-      logger.info("Did not move!: " + possibleFields.size)
-      logger.info("pawn: " + pawn)
-      logger.info("field: " + field.getField(pawn))
-      logger.info("card: " + card)
-      println("Did not move:" + pawn)
-      return
-      // TODO: must be prevented by ifCardPlayable
-      // throw new Exception("Could not move. no move with card: " + card + " and pawn: " + pawn + " in field: " + getField.getField(pawn))
-    }
-    // TODO: remove this, add input for goal
-    for (step <- possibleFields) {
-      if (step.fieldType == model.FieldType.field || step.fieldType == model.FieldType.spawn) {
-        field.movePawn(pawn, step)
-        return
-      }
-    }
-  }
-
-  def moveComplex(pawn: Pawn, card: Card): Unit = {
-    if (card.getValue == 1) {
-      //this.move1(pawn)
-
-    } else if (card.getValue == 4) {
-      this.move4(pawn)
-
-    } else if (card.getValue == 7) {
-      this.move7(pawn)
-
-    } else if (card.getValue == 11) {
-      this.move11(pawn, pawn)
-
-    } else if (card.getValue == 13) {
-      this.move13(pawn)
-
-    } else if (card.getValue == 0) {
-      // Joker is id 0!
-      this.move14(pawn)
-    }
+  // ASS, KING
+  def spawnPawn(pawn: Pawn): Unit = {
+    field.sendPawnOnField(pawn)
   }
 
 
+  // TODO: player may not walk into goals of the others
+  // ###### Calculations Operations ###
   def calcPossibleTargets(node: FieldNode, moveCount: Int): mutable.HashSet[FieldNode] = {
     val list: mutable.HashSet[FieldNode] = mutable.HashSet()
-    calcPossibleTargetsR(list, node, moveCount)
+    calcPossibleTargetsR(list, node, moveCount, node.currentPawn.get.player)
   }
 
-  def calcPossibleTargetsR(targets: mutable.HashSet[FieldNode], start: FieldNode, moveCount: Int): mutable.HashSet[FieldNode] = {
+  def calcPossibleTargetsR(targets: mutable.HashSet[FieldNode], start: FieldNode, moveCount: Int, player: Int): mutable.HashSet[FieldNode] = {
     if (moveCount == 0) {return targets}
     for (step <- field.getGraph(start)) {
-      if (moveCount == 1) {
-        targets += step
+      if (step.player.isEmpty || step.player.contains(player)) {
+        if (moveCount == 1) {
+          targets += step
+        }
+        // add all, because in loop. Scala gods forgive me
+        targets.addAll(this.calcPossibleTargetsR(targets, step, moveCount - 1, player))
       }
-      // add all, because in loop
-      targets.addAll(this.calcPossibleTargetsR(targets, step, moveCount - 1))
     }
     targets
   }
@@ -132,65 +89,6 @@ class NotScuffedMoveController(val gameData: GameData) {
   }
 
 
-  /**
-   * @deprecated do not use this method !
-   * @param pawn -
-   */
-  def move4(pawn: Pawn): Unit = {
-    // TODO: input 4,-4
-    val input = -4
-    val possibleFields =
-      if (input == 4) {
-        calcPossibleTargets(field.getField(pawn), input)
-
-      } else {
-        calcPossibleTargetsReverse(field.getField(pawn), -input)
-
-      }
-    field.movePawn(pawn, possibleFields.head)
-  }
-
-  /**
-   * @deprecated do not use this method !
-   * @param pawn -
-   */
-  def move7(pawn: Pawn): Unit = {
-    // TODO: input single pawns
-    val input = 1 // ??
-    this.move(pawn, Card(input))
-  }
-
-  // BOOBA
-  def move11(pawn1: Pawn, pawn2: Pawn): Unit = {
-    field.swapPawns(pawn1, pawn2)
-  }
-
-  // KING
-  /**
-   * @deprecated do not use this method !
-   * @param pawn -
-   */
-  def move13(pawn: Pawn): Unit = {
-    // TODO: input 13, spawn
-    val input = 1
-    if (input == 13) {
-      val possibleFields = calcPossibleTargets(field.getField(pawn), input)
-      field.movePawn(pawn, possibleFields.head)
-    } else {
-      field.sendPawnOnField(pawn)
-    }
-  }
-
-  /**
-   * @deprecated do not use this method !
-   * @param pawn -
-   */
-  def move14(pawn: Pawn): Unit = {
-    // JOKER
-    // TODO: input 1,2,3,4,5,6,7,8,9,10,11,12,13
-    val input = 2
-    this.move(pawn, Card(input))
-  }
 
 
   // ###### CHECKS Operations ###
@@ -203,47 +101,34 @@ class NotScuffedMoveController(val gameData: GameData) {
     true
   }
 
-  /**
-   * @deprecated do not use this method !
-   * @param pawn -
-   * @param card -
-   */
-  def isSimpleMove(pawn: Pawn, card: Card): Boolean = {
-     isSimpleCard(card) && !hasCardChoicesNow(pawn, card)
-  }
-
-  /**
-   * @deprecated do not use this method !
-   * @param card -
-   */
   def isSimpleCard(card: Card): Boolean = {
     simpleCards.contains(card.getValue)
   }
 
   def hasCardChoicesNow(pawn: Pawn, card: Card): Boolean = {
-    // TODO:
-    false
-  }
-
-
-
-  def isPawnMovable(pawn: Pawn): Boolean = {
-    // TODO:
-    true
+    if (isSimpleCard(card)) {
+      calcPossibleTargets(field.getField(pawn), card.getValue).size > 1
+    } else {
+      // TODO: probably..
+      true
+    }
   }
 
   def isCardPlayable(pawn: Pawn, card: Card): Boolean = {
-    // TODO:
-    true
-  }
-
-  def getField: NotScuffedField = {
-    field
+    if (isSimpleCard(card)) {
+      calcPossibleTargets(field.getField(pawn), card.getValue).nonEmpty
+    } else {
+      // TODO: probably..
+      true
+    }
   }
 
   // ###### DEBUG Operations ###
   // TODO: disable outside of dev
 
+  def getField: NotScuffedField = {
+    field
+  }
 
   def getRandomPawn: Pawn = {
     for (x <- field.getGraph)
